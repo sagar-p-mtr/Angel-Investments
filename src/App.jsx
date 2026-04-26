@@ -327,27 +327,26 @@ function HarvestSection({
     const accumulationYears = Math.max(1, retirementAge - currentAge);
     const accumulation = [];
 
-    for (let year = 0; year <= accumulationYears; year += 1) {
+    for (let year = 0; year < accumulationYears; year += 1) {
       const ratio = year / accumulationYears;
       const age = currentAge + year;
       const corpus = corpusAtRetirement * Math.pow(ratio, 2.2);
+      const monthlyNeed = monthlyExpensesNow * Math.pow(1 + inflationRate / 100, year);
       accumulation.push({
         year,
         label: `Age ${age}`,
         accumulated: Math.round(corpus),
-        required: 0
+        required: Math.round(monthlyNeed)
       });
     }
 
-    const retirementOnly = projection.retirementPath
-      .slice(1)
-      .map((point, index) => ({
+    const retirementOnly = projection.retirementPath.map((point, index) => ({
         ...point,
-        year: accumulationYears + 1 + index
+        year: accumulationYears + index
       }));
 
     return [...accumulation, ...retirementOnly];
-  }, [corpusAtRetirement, currentAge, projection.retirementPath, retirementAge]);
+  }, [corpusAtRetirement, currentAge, inflationRate, monthlyExpensesNow, projection.retirementPath, retirementAge]);
 
   return (
     <section id="harvest" className="section section--framed">
