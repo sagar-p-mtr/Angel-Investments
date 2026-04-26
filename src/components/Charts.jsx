@@ -216,7 +216,15 @@ export function RetirementLineChart({ data, mode = 'default', retireLabel, deple
             grid: darkJourney
               ? { color: 'rgba(61, 113, 167, 0.3)', borderDash: [4, 4] }
               : { display: false },
-            ticks: darkJourney ? { color: '#6d8bb3' } : undefined
+            ticks: darkJourney ? { color: '#6d8bb3' } : { autoSkip: true, maxRotation: 0 },
+            title: darkJourney
+              ? undefined
+              : {
+                display: true,
+                text: 'Age',
+                color: '#3a4f6a',
+                font: { size: 12, weight: 700 }
+              }
           },
           y: {
             grid: darkJourney ? { color: 'rgba(61, 113, 167, 0.3)', borderDash: [4, 4] } : undefined,

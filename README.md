@@ -2,6 +2,8 @@
 
 Production-ready retirement planning web app for Angel Investments.
 
+Latest update includes age-linked corpus growth labeling, anchor-safe section navigation spacing, and editable retirement lifestyle expense buckets.
+
 ## Description
 
 This application helps users evaluate retirement readiness with fully linked calculators:

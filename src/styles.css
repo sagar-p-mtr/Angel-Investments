@@ -211,7 +211,7 @@ a {
   gap: 4px;
   font-family: "Sora", sans-serif;
   line-height: 1.02;
-  font-size: clamp(2.7rem, 6.2vw, 4.9rem);
+  font-size: clamp(2.1rem, 5.2vw, 3.9rem);
   letter-spacing: -0.02em;
 }
 
@@ -312,6 +312,10 @@ a {
   opacity: 0;
   transform: translateY(16px);
   animation: sectionReveal 560ms ease forwards;
+}
+
+.section[id] {
+  scroll-margin-top: 110px;
 }
 
 .section--framed .container {
@@ -641,6 +645,81 @@ a {
   gap: 10px;
 }
 
+.life-inputs--expenses {
+  align-content: start;
+}
+
+.verdict-points {
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: #365272;
+  line-height: 1.65;
+}
+
+.verdict-points li + li {
+  margin-top: 8px;
+}
+
+.expense-editor-card {
+  border: 1px solid #d6e2f0;
+  border-radius: 12px;
+  background: #fff;
+  padding: 10px;
+}
+
+.expense-editor-card__top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.expense-editor-card__top span {
+  color: #214568;
+  font-family: "Sora", sans-serif;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.expense-editor-card__top strong {
+  color: #13355e;
+  font-family: "Sora", sans-serif;
+}
+
+.expense-editor-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.expense-editor-actions input {
+  width: 100%;
+  min-height: 40px;
+  border-radius: 10px;
+  border: 1px solid #cfdbeb;
+  padding: 8px 10px;
+  font-weight: 600;
+}
+
+.button--mini {
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  background: #eaf1fb;
+  color: #12365f;
+  font-size: 0.82rem;
+  box-shadow: none;
+}
+
+.life-controls-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
 .expense-grid {
   margin-top: 12px;
   display: grid;
@@ -823,6 +902,7 @@ a {
 @media (max-width: 1080px) {
   .planner-card,
   .life-layout,
+  .life-controls-grid,
   .call-grid,
   .footer-grid {
     grid-template-columns: 1fr;

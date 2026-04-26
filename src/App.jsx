@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import Navbar from './components/Navbar';
 import { RetirementLineChart } from './components/Charts';
 import {
-  buildExpenseBreakdown,
   calculateHarvestProjection,
   calculateSeedProjection,
   formatCurrency
@@ -430,12 +429,49 @@ function LifeSection({
   onInflationRateChange,
   onYearsToRetireChange
 }) {
+  const [customExpenses, setCustomExpenses] = useState({});
+  const [editingExpenseKey, setEditingExpenseKey] = useState('');
+  const [draftExpenseValue, setDraftExpenseValue] = useState('');
 
   const monthlyNeedAtRetirement = useMemo(
     () => Math.round(monthlyExpensesNow * Math.pow(1 + inflationRate / 100, yearsToRetire)),
     [monthlyExpensesNow, inflationRate, yearsToRetire]
   );
-  const breakdown = useMemo(() => buildExpenseBreakdown(monthlyNeedAtRetirement), [monthlyNeedAtRetirement]);
+
+  const baseExpenseItems = useMemo(
+    () => [
+      { key: 'food', label: 'Food & Groceries', value: Math.round(monthlyNeedAtRetirement * 0.33) },
+      { key: 'utilities', label: 'Utilities & Housing', value: Math.round(monthlyNeedAtRetirement * 0.14) },
+      { key: 'healthcare', label: 'Healthcare', value: Math.round(monthlyNeedAtRetirement * 0.15) },
+      { key: 'leisure', label: 'Leisure & Travel', value: Math.round(monthlyNeedAtRetirement * 0.24) }
+    ],
+    [monthlyNeedAtRetirement]
+  );
+
+  const expenseItems = useMemo(
+    () =>
+      baseExpenseItems.map(item => ({
+        ...item,
+        value: customExpenses[item.key] ?? item.value
+      })),
+    [baseExpenseItems, customExpenses]
+  );
+
+  const breakdownTotal = expenseItems.reduce((sum, item) => sum + item.value, 0);
+  const balanceGap = Math.max(0, monthlyNeedAtRetirement - breakdownTotal);
+
+  const startEditingExpense = (key, value) => {
+    setEditingExpenseKey(key);
+    setDraftExpenseValue(String(value));
+  };
+
+  const saveExpense = key => {
+    const parsed = clamp(Number(draftExpenseValue) || 0, 0, 10000000);
+    setCustomExpenses(prev => ({ ...prev, [key]: parsed }));
+    setEditingExpenseKey('');
+    setDraftExpenseValue('');
+  };
+
   const yearsInRetirement = Math.max(1, lifeExpectancy - retirementAge);
   const estimatedCorpusNeed = Math.round(monthlyNeedAtRetirement * 12 * yearsInRetirement * 0.85);
   const corpusGap = Math.max(0, estimatedCorpusNeed - corpusAtRetirement);
@@ -459,42 +495,77 @@ function LifeSection({
               <span>{t(lang, 'THE VERDICT', 'ತೀರ್ಪು')}</span>
               <strong>{planAtRisk ? t(lang, 'Plan at Risk', 'ಯೋಜನೆ ಅಪಾಯದಲ್ಲಿದೆ') : t(lang, 'Plan on Track', 'ಯೋಜನೆ ಸರಿಯಾದ ದಾರಿಯಲ್ಲಿ')}</strong>
             </div>
-            <p>
-              {planAtRisk
-                ? t(lang, `Estimated gap: ${formatCurrency(corpusGap)}. At current pace, your corpus may fund around ${fundedYearsApprox} years after retirement.`, `ಅಂದಾಜು ಕೊರತೆ: ${formatCurrency(corpusGap)}. ಈಗಿನ ವೇಗದಲ್ಲಿ corpus ನಿವೃತ್ತಿಯ ನಂತರ ಸುಮಾರು ${fundedYearsApprox} ವರ್ಷಗಳಿಗೆ ಸಾಕಾಗಬಹುದು.`)
-                : t(lang, 'Your projected corpus is currently above the estimated requirement for your selected lifestyle.', 'ನೀವು ಆಯ್ಕೆ ಮಾಡಿದ ಜೀವನಶೈಲಿಗೆ ಬೇಕಾದ ಅಂದಾಜು corpus ಗಿಂತ ನಿಮ್ಮ projected corpus ಹೆಚ್ಚಿನದಾಗಿದೆ.')}
-            </p>
+            <ul className="verdict-points">
+              <li>
+                {planAtRisk
+                  ? t(lang, `Estimated corpus gap: ${formatCurrency(corpusGap)}.`, `ಅಂದಾಜು corpus ಕೊರತೆ: ${formatCurrency(corpusGap)}.`)
+                  : t(lang, 'Projected corpus is above your estimated requirement.', 'Projected corpus ನಿಮ್ಮ ಅಂದಾಜು ಅಗತ್ಯಕ್ಕಿಂತ ಹೆಚ್ಚಿದೆ.')}
+              </li>
+              <li>
+                {t(lang, `At current pace, your corpus may fund about ${fundedYearsApprox} years after retirement.`, `ಈ ವೇಗದಲ್ಲಿ corpus ನಿವೃತ್ತಿಯ ನಂತರ ಸುಮಾರು ${fundedYearsApprox} ವರ್ಷಗಳಿಗೆ ಸಾಕಾಗಬಹುದು.`)}
+              </li>
+            </ul>
           </div>
-          <div className="life-inputs">
-            <SliderField label={t(lang, 'Monthly Expenses Now', 'ಇಂದಿನ ಮಾಸಿಕ ಖರ್ಚು')} value={monthlyExpensesNow} onChange={onMonthlyExpensesNowChange} min={10000} max={200000} step={1000} suffix="₹" />
-            <SliderField label={t(lang, 'Inflation Rate', 'ದರ ಏರಿಕೆ ದರ')} value={inflationRate} onChange={onInflationRateChange} min={4} max={12} step={0.5} suffix="%" />
-            <SliderField label={t(lang, 'Years to Retirement', 'ನಿವೃತ್ತಿಗೆ ವರ್ಷಗಳು')} value={yearsToRetire} onChange={onYearsToRetireChange} min={5} max={40} step={1} suffix=" yrs" />
-            <div className="metric-box">
-              <span>{t(lang, 'PROJECTED CORPUS', 'ಅಂದಾಜು Corpus')}</span>
-              <strong>{formatCurrency(corpusAtRetirement)}</strong>
-            </div>
-            <div className="metric-box">
-              <span>{t(lang, 'ESTIMATED CORPUS NEED', 'ಅಂದಾಜು Corpus ಅಗತ್ಯ')}</span>
-              <strong>{formatCurrency(estimatedCorpusNeed)}</strong>
-            </div>
-            <div className="metric-box">
-              <span>{t(lang, 'POST-RET RETURNS', 'ನಿವೃತ್ತಿಯ ನಂತರ Returns')}</span>
-              <strong>{postRetReturn}%</strong>
-            </div>
+          <div className="life-inputs life-inputs--expenses">
+            {expenseItems.map(item => (
+              <div key={item.key} className="expense-editor-card">
+                <div className="expense-editor-card__top">
+                  <span>{item.label}</span>
+                  <strong>{formatCurrency(item.value)}</strong>
+                </div>
+                {editingExpenseKey === item.key ? (
+                  <div className="expense-editor-actions">
+                    <input
+                      type="number"
+                      min={0}
+                      step={500}
+                      value={draftExpenseValue}
+                      onChange={e => setDraftExpenseValue(e.target.value)}
+                    />
+                    <button type="button" className="button button--mini" onClick={() => saveExpense(item.key)}>
+                      {t(lang, 'Save', 'ಉಳಿಸಿ')}
+                    </button>
+                  </div>
+                ) : (
+                  <button type="button" className="button button--mini" onClick={() => startEditingExpense(item.key, item.value)}>
+                    {customExpenses[item.key] != null ? t(lang, 'Edit', 'ತಿದ್ದುಪಡಿ') : t(lang, 'Add', 'ಸೇರಿಸಿ')}
+                  </button>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="life-controls-grid">
+          <SliderField label={t(lang, 'Monthly Expenses Now', 'ಇಂದಿನ ಮಾಸಿಕ ಖರ್ಚು')} value={monthlyExpensesNow} onChange={onMonthlyExpensesNowChange} min={10000} max={200000} step={1000} suffix="₹" />
+          <SliderField label={t(lang, 'Inflation Rate', 'ದರ ಏರಿಕೆ ದರ')} value={inflationRate} onChange={onInflationRateChange} min={4} max={12} step={0.5} suffix="%" />
+          <SliderField label={t(lang, 'Years to Retirement', 'ನಿವೃತ್ತಿಗೆ ವರ್ಷಗಳು')} value={yearsToRetire} onChange={onYearsToRetireChange} min={5} max={40} step={1} suffix=" yrs" />
+          <div className="metric-box">
+            <span>{t(lang, 'PROJECTED CORPUS', 'ಅಂದಾಜು Corpus')}</span>
+            <strong>{formatCurrency(corpusAtRetirement)}</strong>
+          </div>
+          <div className="metric-box">
+            <span>{t(lang, 'ESTIMATED CORPUS NEED', 'ಅಂದಾಜು Corpus ಅಗತ್ಯ')}</span>
+            <strong>{formatCurrency(estimatedCorpusNeed)}</strong>
+          </div>
+          <div className="metric-box">
+            <span>{t(lang, 'POST-RET RETURNS', 'ನಿವೃತ್ತಿಯ ನಂತರ Returns')}</span>
+            <strong>{postRetReturn}%</strong>
           </div>
         </div>
 
         <div className="expense-grid">
-          {breakdown.breakdown.map(item => (
-            <div key={item.label} className="expense-card expense-card--bright">
-              <span>{item.label}</span>
-              <strong>{formatCurrency(item.value)}</strong>
-              {item.editable ? <i>{t(lang, 'Tap any amount to edit', 'ಮೊತ್ತವನ್ನು ತಿದ್ದುಪಡಿ ಮಾಡಲು ಟ್ಯಾಪ್ ಮಾಡಿ')}</i> : null}
-            </div>
-          ))}
           <div className="expense-card expense-card--total">
-            <span>{t(lang, 'TOTAL MONTHLY NEED', 'ಒಟ್ಟು ಮಾಸಿಕ ಅಗತ್ಯ')}</span>
-            <strong>{formatCurrency(breakdown.total)}</strong>
+            <span>{t(lang, 'TOTAL MONTHLY NEED (YOUR EDITED VALUES)', 'ಒಟ್ಟು ಮಾಸಿಕ ಅಗತ್ಯ (ನಿಮ್ಮ ತಿದ್ದುಪಡಿ ಮೌಲ್ಯಗಳು)')}</span>
+            <strong>{formatCurrency(breakdownTotal)}</strong>
+          </div>
+          <div className="expense-card expense-card--total">
+            <span>{t(lang, 'MODEL TARGET MONTHLY NEED', 'ಮಾದರಿ ಗುರಿ ಮಾಸಿಕ ಅಗತ್ಯ')}</span>
+            <strong>{formatCurrency(monthlyNeedAtRetirement)}</strong>
+          </div>
+          <div className="expense-card expense-card--total">
+            <span>{t(lang, 'UNALLOCATED GAP', 'ಹಂಚದಿರುವ ಅಂತರ')}</span>
+            <strong>{formatCurrency(balanceGap)}</strong>
           </div>
         </div>
       </div>
