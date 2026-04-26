@@ -1,3 +1,4 @@
+import { useRef } from 'react';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import {
   Chart as ChartJS,
@@ -129,6 +130,7 @@ export function DelayChart({ startNow, startLater }) {
 }
 
 export function RetirementLineChart({ data, mode = 'default', retireLabel, depletedLabel }) {
+  const chartRef = useRef(null);
   const darkJourney = mode === 'journey';
   const labels = data.map(labelFor);
   const maxY = Math.max(...data.map(item => Number(item.accumulated) || 0), 1);
@@ -146,9 +148,20 @@ export function RetirementLineChart({ data, mode = 'default', retireLabel, deple
         borderWidth: 3
       },
       {
+        label: 'Monthly Need',
+        data: data.map(item => item.required),
+        borderColor: '#f5a623',
+        borderDash: [7, 5],
+        fill: false,
+        tension: 0.25,
+        pointRadius: 0,
+        borderWidth: 2
+      },
+      {
         label: 'Retire marker',
         data: retireLabel ? [{ x: retireLabel, y: 0 }, { x: retireLabel, y: maxY }] : [],
         parsing: false,
+        isMarker: true,
         borderColor: '#f2b33d',
         borderDash: [6, 5],
         pointRadius: 0,
@@ -159,6 +172,7 @@ export function RetirementLineChart({ data, mode = 'default', retireLabel, deple
         label: 'Depleted marker',
         data: depletedLabel ? [{ x: depletedLabel, y: 0 }, { x: depletedLabel, y: maxY }] : [],
         parsing: false,
+        isMarker: true,
         borderColor: '#ff5f67',
         borderDash: [6, 5],
         pointRadius: 0,
@@ -189,18 +203,44 @@ export function RetirementLineChart({ data, mode = 'default', retireLabel, deple
 
   return (
     <Line
+      ref={chartRef}
       data={{
         labels,
         datasets
       }}
+      onClick={event => {
+        const chart = chartRef.current;
+        if (!chart) return;
+
+        const points = chart.getElementsAtEventForMode(event, 'index', { intersect: false }, true);
+        if (!points.length) return;
+
+        const active = points
+          .filter(point => !chart.data.datasets[point.datasetIndex]?.isMarker)
+          .map(point => ({ datasetIndex: point.datasetIndex, index: point.index }));
+
+        if (!active.length) return;
+
+        chart.setActiveElements(active);
+        chart.tooltip.setActiveElements(active, {
+          x: event.native.offsetX,
+          y: event.native.offsetY
+        });
+        chart.update();
+      }}
       options={{
         maintainAspectRatio: false,
         responsive: true,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
         plugins: {
           legend: darkJourney
             ? { display: false }
             : { position: 'bottom', labels: { usePointStyle: true, padding: 18 } },
           tooltip: {
+            filter: ctx => !ctx.dataset.isMarker,
             callbacks: {
               label: ctx => `${ctx.dataset.label}: ${currencyTick(ctx.parsed.y)}`
             }
