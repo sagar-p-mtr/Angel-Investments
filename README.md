@@ -2,7 +2,7 @@
 
 Production-ready retirement planning web app for Angel Investments.
 
-Latest update includes age-linked corpus growth labeling, anchor-safe section navigation spacing, and editable retirement lifestyle expense buckets.
+Latest update includes age-linked corpus growth labeling, anchor-safe section navigation spacing, editable retirement lifestyle expense buckets, and typography tuning where only numbered section keywords are emphasized (not full section headline text).
 
 ## Description
 
