@@ -331,12 +331,11 @@ function HarvestSection({
       const ratio = year / accumulationYears;
       const age = currentAge + year;
       const corpus = corpusAtRetirement * Math.pow(ratio, 2.2);
-      const monthlyNeed = monthlyExpensesNow * Math.pow(1 + inflationRate / 100, year);
       accumulation.push({
         year,
         label: `Age ${age}`,
         accumulated: Math.round(corpus),
-        required: Math.round(monthlyNeed)
+        required: 0
       });
     }
 
@@ -346,7 +345,7 @@ function HarvestSection({
       }));
 
     return [...accumulation, ...retirementOnly];
-  }, [corpusAtRetirement, currentAge, inflationRate, monthlyExpensesNow, projection.retirementPath, retirementAge]);
+  }, [corpusAtRetirement, currentAge, projection.retirementPath, retirementAge]);
 
   return (
     <section id="harvest" className="section section--framed">
