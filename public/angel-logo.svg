@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 340" role="img" aria-label="Angel Investments logo">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#001d5b"/>
+      <stop offset="1" stop-color="#001347"/>
+    </linearGradient>
+    <linearGradient id="orangeArc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#ff7f2a"/>
+      <stop offset="1" stop-color="#ffb126"/>
+    </linearGradient>
+    <linearGradient id="greenArc" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#a9e766"/>
+      <stop offset="1" stop-color="#58bf47"/>
+    </linearGradient>
+    <linearGradient id="pillar" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#cfd1d6"/>
+      <stop offset="1" stop-color="#8f9299"/>
+    </linearGradient>
+  </defs>
+
+  <circle cx="170" cy="170" r="166" fill="#00114a"/>
+  <circle cx="170" cy="170" r="153" fill="url(#bg)"/>
+
+  <path d="M38 189C46 114 96 62 164 35c-56 33-93 85-100 153-12 6-21 6-26 1z" fill="url(#orangeArc)"/>
+  <path d="M28 214c33 66 97 104 182 99 54-3 94-23 121-58-29 50-83 84-151 93-88 12-162-28-190-134z" fill="url(#orangeArc)"/>
+
+  <path d="M186 28c52 3 92 23 123 70-20 0-37 5-55 15-19-30-43-53-68-85z" fill="url(#greenArc)"/>
+  <path d="M266 106c31 37 42 87 21 141-6-31-20-56-39-76 13-20 19-42 18-65z" fill="url(#greenArc)"/>
+
+  <g fill="url(#pillar)">
+    <rect x="111" y="171" width="30" height="68" rx="15"/>
+    <rect x="156" y="141" width="32" height="98" rx="16"/>
+    <rect x="205" y="115" width="34" height="124" rx="17"/>
+  </g>
+</svg>
