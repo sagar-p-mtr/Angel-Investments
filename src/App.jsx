@@ -197,7 +197,7 @@ function SeedSection({
         </div>
 
         <div className="planner-card">
-          <div className="planner-controls">
+          <div className="planner-controls planner-controls--seed">
             {isSipPlan ? (
               <>
                 <SliderField label={t(lang, 'Monthly SIP', 'ಮಾಸಿಕ SIP')} value={state.monthlySip} onChange={monthlySip => setState(prev => ({ ...prev, monthlySip }))} min={1000} max={50000} step={500} suffix="₹" />

@@ -407,11 +407,19 @@ a {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.planner-controls--seed {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
 .planner-controls--harvest > .metric-box {
   grid-column: 1 / -1;
 }
 
 .planner-controls--harvest > .field-card {
+  min-width: 0;
+}
+
+.planner-controls--seed > .field-card {
   min-width: 0;
 }
 
@@ -921,6 +929,10 @@ a {
   }
 
   .planner-controls--harvest {
+    grid-template-columns: 1fr;
+  }
+
+  .planner-controls--seed {
     grid-template-columns: 1fr;
   }
 
