@@ -361,7 +361,7 @@ function HarvestSection({
         />
 
         <div className="planner-card planner-card--clean">
-          <div className="planner-controls">
+          <div className="planner-controls planner-controls--harvest">
             <div className="metric-box metric-box--accent">
               <span>{t(lang, 'CORPUS FROM SEED PLAN', 'ಬೀಜ ಯೋಜನೆಯಿಂದ Corpus')}</span>
               <strong>{formatCurrency(corpusAtRetirement)}</strong>

@@ -403,6 +403,18 @@ a {
   align-content: start;
 }
 
+.planner-controls--harvest {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.planner-controls--harvest > .metric-box {
+  grid-column: 1 / -1;
+}
+
+.planner-controls--harvest > .field-card {
+  min-width: 0;
+}
+
 .field-card {
   border: 1px solid #d6e1ef;
   border-radius: var(--radius-md);
@@ -905,6 +917,10 @@ a {
   .life-controls-grid,
   .call-grid,
   .footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .planner-controls--harvest {
     grid-template-columns: 1fr;
   }
 
